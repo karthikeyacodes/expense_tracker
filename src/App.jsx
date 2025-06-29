@@ -7,7 +7,13 @@ import {
   MenuItem,
   Select,
   FormControl,
+  Button,
+  LinearProgress,
+  Card,
+  CardContent,
+  Typography
 } from "@mui/material";
+import { TextField } from "@mui/material";
 
 function App() {
   //Expenses
@@ -102,176 +108,96 @@ function App() {
 
   return (
     <>
-      <div>
-        <h1>Budgets</h1>
-        <button onClick={() => setBudgetModal(true)}>Add Budget</button>
-      </div>
-      <div>
-        {Object.entries(budgets).map(([category, budget]) => {
-          const spent = totalCategory[category] || 0;
-          const progress = (spent / budget) * 100;
-          return (
-            <div key={category}>
-              <div>
-                <span>{category}</span>
-                <span>
-                  {formatCurrency(spent)} / {formatCurrency(budget)}
-                </span>
-              </div>
-              <progress value={progress} />
-              <div>
-                <span>
-                  Remaining: {formatCurrency(Math.max(budget - spent, 0))}
-                </span>
-                <span> {progress.toFixed(1)}% Used</span>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-      <div>
-        <div>
-          <span>Total</span>
-          <span>
-            {formatCurrency(totalExpenses)} / {formatCurrency(totalBudget)}
-          </span>
-        </div>
-        <progress value={(totalExpenses / totalBudget) * 100} />
-        <div>
-          <span>
-            Remaining:
-            {formatCurrency(Math.max(totalBudget - totalExpenses, 0))}
-          </span>
-          <span> {((totalExpenses / totalBudget) * 100).toFixed(1)}% Used</span>
-        </div>
-      </div>
-      <h1>Expense Tracker</h1>
-      <form onSubmit={updateExpense}>
-        <div>
-          <label htmlFor="description">Description</label>
-          <input
-            type="text"
-            placeholder="Description"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            required
-          />
-        </div>
-        <div>
-          <label htmlFor="amount">Amount (INR)</label>
-          <input
-            type="number"
-            placeholder="Amount"
-            value={amount}
-            onChange={(e) => setAmount(e.target.value)}
-            required
-          />
-        </div>
-        <div>
-          <label htmlFor="date">Date</label>
-          <input
-            type="date"
-            placeholder="Date"
-            value={date}
-            onChange={(e) => setDate(e.target.value)}
-            required
-          />
-        </div>
-        <div>
-          <FormControl fullWidth>
-            <label htmlFor="category" id="category-label">
-              Category
-            </label>
-            <Select
-              labelId="category-label"
-              value={category}
-              onChange={(e) => setCateogry(e.target.value)}
-              label="Select a category"
-            >
-              {Object.keys(budgets).map((budgetCategory) => (
-                <MenuItem key={budgetCategory} value={budgetCategory}>
-                  {budgetCategory}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-        </div>
-        <button type="submit">Add Expense</button>
-      </form>
-      <div>
-        <h2>Expenses:</h2>
-        <ul>
-          {sortedExpenses.map((expense) => (
-            <li key={expense.id}>
+      <Card sx={{ p: 2, mb: 3 }}>
+        <CardContent>
+          <Typography variant="h4">Budgets</Typography>
+          {/* Budget content */}
+          <div>
+            <Button variant="contained" onClick={() => setBudgetModal(true)}>Add Budget</Button>
+          </div>
+          <div>
+            {Object.entries(budgets).map(([category, budget]) => {
+              const spent = totalCategory[category] || 0;
+              const progress = (spent / budget) * 100;
+              return (
+                <div key={category}>
+                  <div>
+                    <span>{category}</span>
+                    <span>
+                      {formatCurrency(spent)} / {formatCurrency(budget)}
+                    </span>
+                  </div>
+                  <LinearProgress variant="determinate" value={progress} color={progress > 80 ? "error" : "primary"} />
+                  <div>
+                    <span>
+                      Remaining: {formatCurrency(Math.max(budget - spent, 0))}
+                    </span>
+                    <span> {progress.toFixed(1)}% Used</span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+          <div>
+            <div>
+              <span>Total</span>
               <span>
-                {expense.description} - {formatCurrency(expense.amount)} -{" "}
-                {expense.date} - {expense.category}
+                {formatCurrency(totalExpenses)} / {formatCurrency(totalBudget)}
               </span>
-              <div>
-                <button onClick={() => handleEdit(expense)}>Edit</button>
-                <button onClick={() => handleDelete(expense.id)}>Delete</button>
-              </div>
-            </li>
-          ))}
-        </ul>
-      </div>
-      <Dialog
-        open={expenseEditModal}
-        onOpenChange={() => setExpenseModal(false)}
-      >
-        <DialogTitle>Edit Expense</DialogTitle>
-        <DialogContent>
-          {editingExpense && (
-            <>
-              <div>
-                <label htmlFor="edit-description">Description</label>
-                <input
-                  type="text"
-                  id="edit-description"
-                  value={editingExpense.amount}
-                  onChange={(e) =>
-                    setEditingExpense({
-                      ...editingExpense,
-                      description: e.target.value,
-                    })
-                  }
-                />
-              </div>
-              <div>
-                <label htmlFor="edit-amount">Amount</label>
-                <input
-                  type="number"
-                  id="edit-amount"
-                  value={editingExpense.amount}
-                  onChange={(e) =>
-                    setEditingExpense({
-                      ...editingExpense,
-                      amount: parseFloat(e.target.value),
-                    })
-                  }
-                />
-              </div>
-              <div>
-                <label htmlFor="edit-date">Date</label>
-                <input
-                  type="date"
-                  id="edit-date"
-                  value={editingExpense.date}
-                  onChange={(e) =>
-                    setEditingExpense({
-                      ...editingExpense,
-                      date: e.target.value,
-                    })
-                  }
-                />
-              </div>
-              <div>
-                <label htmlFor="edit-category">Category</label>
+            </div>
+            <LinearProgress variant="determinate"
+              value={totalBudget ? (totalExpenses / totalBudget) * 100 : 0}
+              color={(totalBudget ? (totalExpenses / totalBudget) * 100 : 0) > 80 ? "error" : "primary"} />
+            <div>
+              <span>
+                Remaining:
+                {formatCurrency(Math.max(totalBudget - totalExpenses, 0))}
+              </span>
+              <span> {(totalBudget ? (totalExpenses / totalBudget) * 100 : 0).toFixed(1)}% Used</span>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+      <Card sx={{ p: 2, mb: 3 }}>
+        <CardContent>
+          <Typography variant="h4">Expense Info</Typography>
+          {/* Budget content */}
+          {/* <h1>Expense Tracker</h1> */}
+          <form onSubmit={updateExpense}>
+            <div>
+              <TextField
+                label="Description"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                required
+              />
+            </div>
+            <div>
+              <TextField
+                label="Amount"
+                value={amount}
+                onChange={(e) => setAmount(e.target.value)}
+                required
+              />
+            </div>
+            <div>
+              <TextField
+                type="date"
+                value={date}
+                onChange={(e) => setDate(e.target.value)}
+                fullWidth
+              />
+            </div>
+            <div>
+              <FormControl fullWidth>
+                <label htmlFor="category" id="category-label">
+                  Category
+                </label>
                 <Select
-                  value={editingExpense.category}
-                  onChange={(value) => {
-                    setEditingExpense({ ...editingExpense, category: value });
-                  }}
+                  labelId="category-label"
+                  value={category}
+                  onChange={(e) => setCateogry(e.target.value)}
+                  label="Select a category"
                 >
                   {Object.keys(budgets).map((budgetCategory) => (
                     <MenuItem key={budgetCategory} value={budgetCategory}>
@@ -279,44 +205,136 @@ function App() {
                     </MenuItem>
                   ))}
                 </Select>
-              </div>
-            </>
-          )}
-          <DialogActions>
-            <button onClick={handleUpdate}>Save Changes</button>
-          </DialogActions>
-        </DialogContent>
-      </Dialog>
-
-      <Dialog open={budgetEditModal} onOpenChange={() => setBudgetModal(false)}>
-        <DialogTitle>Edit Budget</DialogTitle>
-        <DialogContent>
+              </FormControl>
+            </div>
+            <Button variant="contained" type="submit">Add Expense</Button>
+          </form>
+        </CardContent>
+      </Card>
+      <Card sx={{ p: 2, mb: 3 }}>
+        <CardContent>
+          <Typography variant="h4">Expenses: </Typography>
+          {/* Budget content */}
           <div>
-            <div>
-              <label htmlFor="budget-category">Category</label>
-              <input
-                type="text"
-                id="budget-category"
-                value={budgetCategory}
-                onChange={(e) => setBudgetCategory(e.target.value)}
-                placeholder="e.g., Food, Groceries"
-              />
-            </div>
-            <div>
-              <label htmlFor="budget-amount">Budget Amount (INR)</label>
-              <input
-                type="number"
-                value={budgetAmount}
-                onChange={(e) => setBudgetAmount(e.target.value)}
-                placeholder="Enter budget amount"
-              />
-            </div>
+            <ul>
+              {sortedExpenses.map((expense) => (
+                <li key={expense.id}>
+                  <span>
+                    {expense.description} - {formatCurrency(expense.amount)} -{" "}
+                    {expense.date} - {expense.category}
+                  </span>
+                  <div>
+                    <Button variant="contained" onClick={() => handleEdit(expense)}>Edit</Button>
+                    <Button variant="contained" onClick={() => handleDelete(expense.id)}>Delete</Button>
+                  </div>
+                </li>
+              ))}
+            </ul>
           </div>
-          <DialogActions>
-            <button onClick={addBudget}>Save Changes</button>
-          </DialogActions>
-        </DialogContent>
-      </Dialog>
+          <Dialog
+            open={expenseEditModal}
+            onOpenChange={() => setExpenseModal(false)}
+          >
+            <DialogTitle>Edit Expense</DialogTitle>
+            <DialogContent>
+              {editingExpense && (
+                <>
+                  <div>
+                    <label htmlFor="edit-description">Description</label>
+                    <input
+                      type="text"
+                      id="edit-description"
+                      value={editingExpense.amount}
+                      onChange={(e) =>
+                        setEditingExpense({
+                          ...editingExpense,
+                          description: e.target.value,
+                        })
+                      }
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="edit-amount">Amount</label>
+                    <input
+                      type="number"
+                      id="edit-amount"
+                      value={editingExpense.amount}
+                      onChange={(e) =>
+                        setEditingExpense({
+                          ...editingExpense,
+                          amount: parseFloat(e.target.value),
+                        })
+                      }
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="edit-date">Date</label>
+                    <input
+                      type="date"
+                      id="edit-date"
+                      value={editingExpense.date}
+                      onChange={(e) =>
+                        setEditingExpense({
+                          ...editingExpense,
+                          date: e.target.value,
+                        })
+                      }
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="edit-category">Category</label>
+                    <Select
+                      value={editingExpense.category}
+                      onChange={(value) => {
+                        setEditingExpense({ ...editingExpense, category: value });
+                      }}
+                    >
+                      {Object.keys(budgets).map((budgetCategory) => (
+                        <MenuItem key={budgetCategory} value={budgetCategory}>
+                          {budgetCategory}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </div>
+                </>
+              )}
+              <DialogActions>
+                <Button variant="contained" onClick={handleUpdate}>Save Changes</Button>
+              </DialogActions>
+            </DialogContent>
+          </Dialog>
+
+          <Dialog open={budgetEditModal} onOpenChange={() => setBudgetModal(false)}>
+            <DialogTitle>Edit Budget</DialogTitle>
+            <DialogContent>
+              <div>
+                <div>
+                  <label htmlFor="budget-category">Category</label>
+                  <input
+                    type="text"
+                    id="budget-category"
+                    value={budgetCategory}
+                    onChange={(e) => setBudgetCategory(e.target.value)}
+                    placeholder="e.g., Food, Groceries"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="budget-amount">Budget Amount (INR)</label>
+                  <input
+                    type="number"
+                    value={budgetAmount}
+                    onChange={(e) => setBudgetAmount(e.target.value)}
+                    placeholder="Enter budget amount"
+                  />
+                </div>
+              </div>
+              <DialogActions>
+                <Button variant="contained" onClick={addBudget}>Save Changes</Button>
+              </DialogActions>
+            </DialogContent>
+          </Dialog>
+        </CardContent>
+      </Card>
     </>
   );
 }
